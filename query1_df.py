@@ -10,13 +10,13 @@ spark = SparkSession \
     .appName("Query 1 Implementation") \
     .getOrCreate()
 
+# Record the start time
+start_time = time.time()
+
 # Create dataset and extract month and year from DATE OCC field (DATE OCC is the date when each crime occured)
 crimes_df = create_dataset()
 crimes_df = crimes_df.withColumn('month', month(col('DATE OCC'))) \
                      .withColumn('year', year(col('DATE OCC')))
-
-# Record the start time
-start_time = time.time()
 
 # Group crimes by year and month with count as an aggregation method
 grouped_df = crimes_df.groupby('year', 'month').agg(count("*").alias("crime_total"))
