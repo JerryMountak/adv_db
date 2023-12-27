@@ -1,6 +1,6 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructField, StructType, IntegerType, FloatType, StringType
-from pyspark.sql.functions import to_date, col,to_timestamp
+from pyspark.sql.functions import to_date, col, to_timestamp, regexp_replace
 
 def create_dataset():
     spark = SparkSession \
@@ -49,6 +49,40 @@ def create_dataset():
 
 
     return crimes_df
+
+
+def create_householdIncome_dataset():
+    
+    spark = SparkSession \
+        .builder \
+        .appName("Income Dataframe creation") \
+        .getOrCreate()
+    
+    income_schema = StructType([
+        StructField("Zip Code", StringType()),
+        StructField("Community", StringType()),
+        StructField("Estimated Median Income", StringType()),       
+    ])
+
+    income_df = spark.read.csv("hdfs://okeanos-master:54310/dataset/income/LA_income_2015.csv", header=True, schema=income_schema)
+    income_df = income_df.withColumn("Estimated Median Income", regexp_replace(col("Estimated Median Income"), "[^0-9]", "").cast("int"))
+    return income_df
+
+
+def create_revgecoding_dataset():
+    spark = SparkSession \
+        .builder \
+        .appName("Reverse GeCoding Dataframe creation") \
+        .getOrCreate()
+
+    revgecoding_schema = StructType([
+        StructField("LAT", FloatType()),
+        StructField("LON", FloatType()),
+        StructField("Zip Code", StringType())
+    ])
+
+    revgecoding_df = spark.read.csv("hdfs://okeanos-master:54310/dataset/revgecoding.csv", header=True, schema=revgecoding_schema)
+    return revgecoding_df
 
 
 def main():
