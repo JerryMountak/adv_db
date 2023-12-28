@@ -3,7 +3,7 @@ import time
 
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StringType
-from pyspark.sql.functions import col, count, udf,year
+from pyspark.sql.functions import col, count, udf, year
 
 spark = SparkSession \
     .builder \
@@ -49,7 +49,7 @@ crimes_df = crimes_df.withColumn('year', year(col('DATE OCC'))) \
                      .filter((col('year') == 2015) & (col('Vict Descent') != '')) \
                      .withColumn('Vict Descent', victim_descent_udf(col('Vict Descent')))
 
-# Join crimes and gecoding datasets on coordinates columns
+# Join crimes and geocoding datasets on coordinates columns
 joined_df = crimes_df.join(revgecoding_df, on = ["LAT","LON"])
 
 # Highest Income Areas Calculation
@@ -66,8 +66,9 @@ lowest_result_df = lowest_join_df.groupby('Vict Descent').agg(count("*").alias('
                                    .orderBy(col('#').desc()) \
                                    .select('Vict Descent','#')
 
-
+print('Results for the three highest median income areas')
 highest_result_df.show(truncate=False)
+print('Results for the three lowest median income areas')
 lowest_result_df.show(truncate=False)
 
 # Record the end time
