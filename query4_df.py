@@ -58,6 +58,7 @@ crimes_per_year_df = joined_df.withColumn('year', year(col('DATE OCC'))) \
                      .withColumn('average_distance', round(col('average_distance'), 3)) \
                      .orderBy(col('year').asc())
 
+print('Results for crimes per year')
 crimes_per_year_df.show(50,truncate=False)
 
 
@@ -67,6 +68,7 @@ crimes_per_pd_df = joined_df.groupby('DIVISION').agg(avg('distance').alias("aver
                      .withColumn('average_distance', round(col('average_distance'), 3)) \
                      .orderBy(col('#').desc())
 
+print('Results for crimes per division')
 crimes_per_pd_df.show(50,truncate=False)
 
 
@@ -96,6 +98,7 @@ crimes_per_year2_df = joined2_df.withColumn('year', year(col('DATE OCC'))) \
                      .withColumn('average_distance', round(col('average_distance'), 3)) \
                      .orderBy(col('year').asc())
 
+print('Results for crimes per year')
 crimes_per_year2_df.show(50,truncate=False)
 
 
@@ -105,4 +108,5 @@ crimes_per_pd2_df = joined2_df.groupby('DIVISION').agg(avg('distance').alias("av
                      .withColumn('average_distance', round(col('average_distance'), 3)) \
                      .orderBy(col('#').desc())
 
+print('Results for crimes per division')
 crimes_per_pd2_df.show(50,truncate=False)
