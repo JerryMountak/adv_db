@@ -32,13 +32,13 @@ def parse_csv_line(line):
 start_time = time.time()
 
 
-crime1 = spark.textFile("hdfs://okeanos-master:54310/dataset/crimes10_19.csv") \
+crime1 = spark.textFile("hdfs://master:54310/dataset/crimes10_19.csv") \
               .map(lambda x: parse_csv_line(x))
 header1 = crime1.first()
 crime1 = crime1.filter(lambda row: row != header1)
 
 
-crime2 = spark.textFile("hdfs://okeanos-master:54310/dataset/crimes20_present.csv") \
+crime2 = spark.textFile("hdfs://master:54310/dataset/crimes20_present.csv") \
               .map(lambda x: parse_csv_line(x))
 header2 = crime2.first()
 crime2 = crime2.filter(lambda row: row != header2)
