@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.types import StructField, StructType, IntegerType, FloatType, StringType
+from pyspark.sql.types import StructField, StructType, IntegerType, DoubleType, StringType
 from pyspark.sql.functions import to_date, col, to_timestamp, regexp_replace
 
 def create_dataset():
@@ -35,15 +35,13 @@ def create_dataset():
         StructField("Crm Cd 4", IntegerType()),
         StructField("LOCATION", StringType()),
         StructField("Cross Street", StringType()),
-        StructField("LAT", FloatType()),
-        StructField("LON", FloatType()),
+        StructField("LAT", DoubleType()),
+        StructField("LON", DoubleType()),
     ])
 
-    crimes10_19_df = spark.read.csv("hdfs://okeanos-master:54310/dataset/crimes10_19.csv", header=True, schema=crimes_schema)
-    crimes20_pr_df = spark.read.csv("hdfs://okeanos-master:54310/dataset/crimes20_present.csv", header=True, schema=crimes_schema)
+    crimes10_19_df = spark.read.csv("hdfs://master:54310/dataset/crimes10_19.csv", header=True, schema=crimes_schema)
+    crimes20_pr_df = spark.read.csv("hdfs://master:54310/dataset/crimes20_present.csv", header=True, schema=crimes_schema)
     crimes_df = crimes10_19_df.union(crimes20_pr_df)
-    #crimes_df = crimes_df.withColumn("Date Rptd", to_date(col("Date Rptd"),'MM-DD-YYYY\'T\'HH:mm:ss.SSS')) \
-    #                     .withColumn("DATE OCC", to_date(col("DATE OCC"),'MM-DD-YYYY\'T\'HH:mm:ss.SSS'))
     crimes_df = crimes_df.withColumn("Date Rptd", to_date(to_timestamp(col("Date Rptd"), "MM/dd/yyyy hh:mm:ss a"))) \
                          .withColumn("DATE OCC", to_date(to_timestamp(col("DATE OCC"), "MM/dd/yyyy hh:mm:ss a")))
 
@@ -64,7 +62,7 @@ def create_householdIncome_dataset():
         StructField("Estimated Median Income", StringType()),       
     ])
 
-    income_df = spark.read.csv("hdfs://okeanos-master:54310/dataset/income/LA_income_2015.csv", header=True, schema=income_schema)
+    income_df = spark.read.csv("hdfs://master:54310/dataset/LA_income_2015.csv", header=True, schema=income_schema)
     income_df = income_df.withColumn("Estimated Median Income", regexp_replace(col("Estimated Median Income"), "[^0-9]", "").cast("int"))
     return income_df
 
@@ -76,14 +74,31 @@ def create_revgecoding_dataset():
         .getOrCreate()
 
     revgecoding_schema = StructType([
-        StructField("LAT", FloatType()),
-        StructField("LON", FloatType()),
+        StructField("LAT", DoubleType()),
+        StructField("LON", DoubleType()),
         StructField("Zip Code", StringType())
     ])
 
-    revgecoding_df = spark.read.csv("hdfs://okeanos-master:54310/dataset/revgecoding.csv", header=True, schema=revgecoding_schema)
+    revgecoding_df = spark.read.csv("hdfs://master:54310/dataset/revgecoding.csv", header=True, schema=revgecoding_schema)
     return revgecoding_df
 
+def create_police_stations_dataset():
+    spark = SparkSession \
+        .builder \
+        .appName("Police Stations Dataframe creation") \
+        .getOrCreate()
+
+    stations_schema = StructType([
+        StructField("X", DoubleType()),
+        StructField("Y", DoubleType()),
+        StructField("FID", IntegerType()),
+        StructField("DIVISION", StringType()),
+        StructField("LOCATION", StringType()),
+        StructField("PREC", IntegerType()),
+    ])
+
+    stations_df = spark.read.csv("hdfs://master:54310/dataset/police_stations.csv", header=True, schema=stations_schema)
+    return stations_df
 
 def main():
     crimes_df = create_dataset()
@@ -97,8 +112,6 @@ def main():
     
     for c in crimes_df.dtypes:
         print(c)
-
-    print("END OF PROGRAM")
 
 
 if __name__ == "__main__":
