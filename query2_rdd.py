@@ -19,7 +19,6 @@ def determine_part_of_day(row):
     elif 1700 <= time_occ <= 2059:
         return ('Evening', 1)
     else:
-        # night ends at 0400 ??
         return ('Night', 1)
 
 

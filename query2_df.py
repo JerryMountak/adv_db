@@ -20,7 +20,6 @@ def determine_part_of_day(time_occ):
     elif 1700 <= time_occ <= 2059:
         return 'Evening'
     else:
-        # night ends at 0400 ??
         return 'Night'
     
 # Register the UDF
