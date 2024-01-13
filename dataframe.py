@@ -80,6 +80,7 @@ def create_revgecoding_dataset():
     ])
 
     revgecoding_df = spark.read.csv("hdfs://master:54310/dataset/revgecoding.csv", header=True, schema=revgecoding_schema)
+    revgecoding_df = revgecoding_df.withColumn("Zip Code", regexp_replace("Zip Code", "(\\d+).*", "$1"))
     return revgecoding_df
 
 def create_police_stations_dataset():
